@@ -13,7 +13,7 @@
 
 using namespace facebook::react;
 
-@interface RTNVera () <RCTRTNVeraViewProtocol>
+@interface RTNVera () <RCTRTNVeraViewProtocol, VeraDelegateObjC>
 @end
 
 @implementation RTNVera {
@@ -29,6 +29,7 @@ using namespace facebook::react;
         static const auto defaultProps = std::make_shared<const RTNVeraProps>();
         _props = defaultProps;
 
+        [VeraObjC useDelegate:self];
         _view = [VeraObjC view];
         self.contentView = _view;
     }
@@ -67,6 +68,32 @@ using namespace facebook::react;
     }
 
     [super updateProps:props oldProps:oldProps];
+}
+
+#pragma mark VeraDelegateObjC
+
+- (void)veraNeedsToLogin {
+    if (_eventEmitter != nullptr) {
+        std::dynamic_pointer_cast<const RTNVeraEventEmitter>(_eventEmitter)->onLogin({});
+    }
+}
+
+- (void)veraNeedsToLogout {
+    if (_eventEmitter != nullptr) {
+        std::dynamic_pointer_cast<const RTNVeraEventEmitter>(_eventEmitter)->onLogout({});
+    }
+}
+
+- (void)veraShouldRefreshToken {
+    if (_eventEmitter != nullptr) {
+        std::dynamic_pointer_cast<const RTNVeraEventEmitter>(_eventEmitter)->onRefreshToken({});
+    }
+}
+
+- (void)handleVeraMessageWithSender:(NSString * _Nonnull)sender data:(NSString * _Nonnull)data {
+    if (_eventEmitter != nullptr) {
+        std::dynamic_pointer_cast<const RTNVeraEventEmitter>(_eventEmitter)->onHandleMessage({.sender=[sender UTF8String], .data=[data UTF8String]});
+    }
 }
 
 @end

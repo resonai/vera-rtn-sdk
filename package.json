@@ -30,10 +30,7 @@
   },
   "codegenConfig": {
     "name": "RTNVeraSpec",
-    "type": "modules",
-    "jsSrcsDir": "js",
-    "android": {
-      "javaPackageName": "com.verartn"
-    }
+    "type": "components",
+    "jsSrcsDir": "js"
   }
 }

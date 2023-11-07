@@ -70,6 +70,29 @@ using namespace facebook::react;
     [super updateProps:props oldProps:oldProps];
 }
 
+- (void)handleCommand:(nonnull const NSString *)commandName args:(nonnull const NSArray *)args { 
+    RCTRTNVeraHandleCommand(self, commandName, args);
+}
+
+#pragma mark Commands
+
+- (void)pause {
+    [VeraObjC pause];
+}
+
+- (void)resume {
+    [VeraObjC resume];
+}
+
+- (void)sendDeeplink:(nonnull NSString *)link {
+    [VeraObjC sendDeeplink:link];
+}
+
+- (void)sendMessage:(nonnull NSString *)receiver data:(nonnull NSString *)data {
+    [VeraObjC sendMessageWithReceiver:receiver data:data];
+}
+
+
 #pragma mark VeraDelegateObjC
 
 - (void)veraNeedsToLogin {

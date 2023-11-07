@@ -40,7 +40,7 @@ export interface VeraNativeProps extends ViewProps {
 
 type ComponentType = HostComponent<VeraNativeProps>;
 
-interface NativeCommands {
+export interface NativeCommands {
     pause: (viewRef: React.ElementRef<ComponentType>) => void;
     resume: (viewRef: React.ElementRef<ComponentType>) => void;
     sendDeeplink: (

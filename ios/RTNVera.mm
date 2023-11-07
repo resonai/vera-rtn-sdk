@@ -62,7 +62,7 @@ using namespace facebook::react;
         VeraConfigurationObjC *configuration = [[VeraConfigurationObjC alloc] initWithDomain:domain
                                                                                     username:config.username.length() == 0 ? nil : RCTNSStringFromString(config.username)
                                                                                          app:objcApp
-                                                                                    language:RCTNSStringFromString(config.language)];
+                                                                                    language:RCTNSStringFromString(toString(config.language))];
 
         [VeraObjC useConfiguration:configuration];
     }

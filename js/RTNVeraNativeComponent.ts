@@ -1,7 +1,8 @@
 import type {ViewProps} from 'react-native/Libraries/Components/View/ViewPropTypes';
 import type {HostComponent, NativeSyntheticEvent} from 'react-native';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
-import { DirectEventHandler } from 'react-native/Libraries/Types/CodegenTypes';
+import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
+import { DirectEventHandler, WithDefault } from 'react-native/Libraries/Types/CodegenTypes';
 import React from 'react';
 import RTNVera from 'vera-rtn-sdk/js';
 import PropTypes from 'prop-types';
@@ -15,31 +16,13 @@ export type App = {
     deeplinkPrefix?: string
 }
 
-// export enum VeraLanguage {
-//     En = 'en',
-//     Ru = 'ru',
-//     Zh = 'zh',
-//     De = 'de',
-//     Hi = 'hi',
-//     Th = 'th',
-//     Ja = 'ja',
-//     Vi = 'vi',
-//     Fr = 'fr',
-//     Es = 'es',
-//     Sv = 'sv',
-//     He = 'he'
-// }
-
-const VeraLanguage = {
-    En: 'en',
-    Ru: 'ru'
-}
+export type VeraLanguage = 'en' | 'ru' | 'zh' | 'de' | 'hi' | 'th' | 'ja' | 'vi' | 'fr' | 'es' | 'sv' | 'he'
 
 export type VeraConfiguration = {
     domain?: string,
     username?: string,
     app: App,
-    language?: string
+    language?: WithDefault<VeraLanguage, 'en'>
 }
 
 export type VeraMessage = {
@@ -55,38 +38,36 @@ export interface VeraNativeProps extends ViewProps {
     onHandleMessage?: DirectEventHandler<VeraMessage>
 }
 
-export class VeraView extends React.PureComponent<VeraNativeProps> {
-    _onHandleMessage = (event: NativeSyntheticEvent<VeraMessage>) => {
-        if (!this.props.onHandleMessage) {
-            console.log('onHandleMessage is nil')
-            return
-        }
-        this.props.onHandleMessage(event)
-    }
+type ComponentType = HostComponent<VeraNativeProps>;
 
-    render(): React.ReactNode {
-        return <RTNVera {...this.props} onHandleMessage={this._onHandleMessage}/>
-    }
+interface NativeCommands {
+    pause: (viewRef: React.ElementRef<ComponentType>) => void;
+    resume: (viewRef: React.ElementRef<ComponentType>) => void;
+    sendDeeplink: (
+        viewRef: React.ElementRef<ComponentType>,
+        link: string
+    ) => void;
+    sendMessage: (
+        viewRef: React.ElementRef<ComponentType>, 
+        receiver: string,
+        data: string
+    ) => void;
+}
 
-    static propTypes = {
-        config: PropTypes.shape({
-            domain: PropTypes.string,
-            username: PropTypes.string,
-            language: PropTypes.string,
-            app: PropTypes.shape({
-                clientId: PropTypes.string.isRequired,
-                siteIds: PropTypes.arrayOf(PropTypes.string),
-                shouldShowCloseButton: PropTypes.bool,
-                hideHeader: PropTypes.bool,
-                implementsAuthentication: PropTypes.bool,
-                deeplinkPrefix: PropTypes.bool
-            })
-        }),
-        onLogin: PropTypes.func,
-        onLogout: PropTypes.func,
-        onRefreshToken: PropTypes.func,
-        onHandleMessage: PropTypes.func
-    }
+export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({
+  supportedCommands: [
+    'pause',
+    'resume',
+    'sendDeeplink',
+    'sendMessage',
+  ]
+});
+
+export type VeraCommands = {
+    pause: () => void,
+    resume: () => void,
+    sendDeeplink: (link: string) => void,
+    sendMessage: (receiver: string, data: string) => void
 }
 
 export default codegenNativeComponent<VeraNativeProps>(

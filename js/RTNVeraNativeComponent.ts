@@ -2,8 +2,8 @@ import type {ViewProps} from 'react-native/Libraries/Components/View/ViewPropTyp
 import type {HostComponent, NativeSyntheticEvent} from 'react-native';
 import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNativeComponent';
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
-import { DirectEventHandler, WithDefault } from 'react-native/Libraries/Types/CodegenTypes';
-import React from 'react';
+import { DirectEventHandler, Int32, WithDefault } from 'react-native/Libraries/Types/CodegenTypes';
+import React, { Component } from 'react';
 import RTNVera from 'vera-rtn-sdk/js';
 import PropTypes from 'prop-types';
 
@@ -52,6 +52,10 @@ export interface NativeCommands {
         receiver: string,
         data: string
     ) => void;
+    create: (
+        viewRef: React.ElementRef<ComponentType>,
+        viewId: Int32
+    ) => void
 }
 
 export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({
@@ -60,6 +64,7 @@ export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({
     'resume',
     'sendDeeplink',
     'sendMessage',
+    'create'
   ]
 });
 

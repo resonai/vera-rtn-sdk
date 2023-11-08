@@ -1,6 +1,6 @@
 import { NativeMethods, NativeSyntheticEvent, ViewProps } from "react-native"
-import { Commands, NativeCommands, VeraCommands, VeraConfiguration, VeraMessage, VeraNativeProps } from "./RTNVeraNativeComponent"
-import RTNVera from "./RTNVeraNativeComponent"
+import { Commands, NativeCommands, VeraCommands, VeraConfiguration, VeraMessage, VeraNativeProps } from "vera-rtn-sdk/js/RTNVeraNativeComponent"
+import RTNVera from "vera-rtn-sdk/js/RTNVeraNativeComponent"
 import React from 'react';
 
 export type VeraComponent = React.Component<VeraNativeProps> & NativeMethods & VeraCommands
@@ -41,7 +41,7 @@ export class VeraView extends React.Component<VeraProps> {
           method(ref);
         } else {
           console.warn(
-            'Reference to native search bar component has not been updated yet'
+            'Reference to native Vera component has not been updated yet'
           );
         }
       }
@@ -68,6 +68,12 @@ export class VeraView extends React.Component<VeraProps> {
         this._callMethodWithRef(ref =>
           Commands.sendMessage(ref, receiver, data)
         );
+      }
+
+      create(viewId: number) {
+        this._callMethodWithRef(ref => 
+          Commands.create(ref, viewId)
+        )
       }
 
     // MARK: - Callbacks

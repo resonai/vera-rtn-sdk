@@ -1,12 +1,17 @@
 package com.rtnvera
 
+import android.graphics.Color
+import android.os.Bundle
 import android.view.Choreographer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
@@ -20,136 +25,89 @@ import com.facebook.react.uimanager.annotations.ReactProp
 import com.facebook.react.uimanager.annotations.ReactPropGroup
 import com.facebook.react.viewmanagers.RTNVeraManagerDelegate
 import com.facebook.react.viewmanagers.RTNVeraManagerInterface
+import com.resonai.common.helpers.Languages
 import com.resonai.di.VeraIsolatedKoinContext
 import com.resonai.irocket.VeraConfiguration
+import com.resonai.irocket.VeraFragment
 
 @ReactModule(name = RTNVeraManager.NAME)
-class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<LinearLayout>(),
-    RTNVeraManagerInterface<LinearLayout> {
+class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RTNVera>(),
+    RTNVeraManagerInterface<RTNVera> {
     private val delegate = RTNVeraManagerDelegate(this)
+    private var vera: VeraConfiguration.Builder? = null
 
-    val COMMAND_CREATE = 1
-
-    private var propWidth: Int? = null
-    private var propHeight: Int? = null
-
-    override fun getDelegate(): ViewManagerDelegate<LinearLayout> = delegate
+    override fun getDelegate(): ViewManagerDelegate<RTNVera> = delegate
 
     override fun getName(): String = NAME
 
-    override fun createViewInstance(context: ThemedReactContext): LinearLayout {
-//        val layout = LinearLayout(context)
-//        layout.id = View.generateViewId()
-//        val params = FrameLayout.LayoutParams(
-//            ViewGroup.LayoutParams.MATCH_PARENT,
-//            ViewGroup.LayoutParams.MATCH_PARENT
-//        )
-//        layout.layoutParams = params
-
-//        val layout = LayoutInflater.from(context).inflate(R.layout.container, null) as LinearLayout
-
-        VeraIsolatedKoinContext.setContext(context)
-
-//        layout.handler?.post {
-//            // Make sure we're still attached and in a good state
-//            if (layout.isAttachedToWindow) {
-//                val fragmentManager = (context.currentActivity as FragmentActivity).supportFragmentManager
-//                val veraBuilder = VeraConfiguration.Builder(
-//                    fragmentManager, layout.findViewById(R.id.container)
-//                )
-//
-//                veraBuilder.startWithoutLogin()
-//            }
-//        }
-
-        return LinearLayout(context)
-    }
+    override fun createViewInstance(context: ThemedReactContext) = RTNVera(context)
 
     @ReactProp(name = "config")
-    override fun setConfig(view: LinearLayout?, value: ReadableMap?) {
-//        val fragmentManager = (context.currentActivity as FragmentActivity).supportFragmentManager
-//        val veraBuilder = VeraConfiguration.Builder(
-//            fragmentManager, view!!
-//        )
-//
-//        veraBuilder.startWithoutLogin()
+    override fun setConfig(view: RTNVera?, value: ReadableMap?) {
+        val fragmentManager = (context.currentActivity as FragmentActivity).supportFragmentManager
+
+        vera = VeraConfiguration.Builder(
+            fragmentManager, view!!, context
+        )
+        value?.let {
+            vera?.apply {
+                it.getMap("app")?.let { app ->
+                    if (app.hasKey("siteIds")) app.getArray("siteIds")?.let { ids -> setSiteIDs(Arguments.toList(ids)?.toList()?.map { it.toString() }) }
+                    if (app.hasKey("clientId")) app.getString("clientId")?.let { setClientAppID(it) }
+                    if (app.hasKey("shouldShowCloseButton")) app.getBoolean("shouldShowCloseButton")?.let { setShowCloseButton(it) }
+                    if (app.hasKey("hideHeader")) app.getBoolean("hideHeader")?.let { setHideHeader(it) }
+                    if (app.hasKey("deeplinkPrefix")) app.getString("deeplinkPrefix")?.let { setDeeplinkPrefix(it) }
+                }
+                if (it.hasKey("domain")) it.getString("domain")?.let { setVeraDomain(it) }
+                if (it.hasKey("language")) it.getString("language")?.let { setLanguage(Languages.valueOf(it.uppercase())) }
+            }
+        }
+
+        vera?.startWithoutLogin()
+
+        fragmentManager.registerFragmentLifecycleCallbacks(object : FragmentManager.FragmentLifecycleCallbacks() {
+            override fun onFragmentViewCreated(fm: FragmentManager, f: Fragment, v: View, savedInstanceState: Bundle?) {
+                super.onFragmentViewCreated(fm, f, v, savedInstanceState)
+
+                manuallyLayoutChildren(view!!)
+            }
+        }, false)
     }
 
-    @ReactPropGroup(names = ["width", "height"], customType = "Style")
-    fun setStyle(view: LinearLayout, index: Int, value: Int) {
-        if (index == 0) propWidth = value
-        if (index == 1) propHeight = value
+    private fun manuallyLayoutChildren(view: View) = view.apply {
+        measure(
+            View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY)
+        )
+
+        layout(left, top, right, bottom)
     }
 
     companion object {
         const val NAME = "RTNVera"
     }
 
-    override fun receiveCommand(root: LinearLayout, commandId: String?, args: ReadableArray?) {
-//        super.receiveCommand(root, commandId, args)
+    override fun receiveCommand(root: RTNVera, commandId: String?, args: ReadableArray?) {
+        super.receiveCommand(root, commandId, args)
 
         when (commandId) {
-            "create" -> create(root, args!!.getInt(0))
-//            "blur" -> root.handleBlurJsRequest()
-//            "clearText" -> root.handleClearTextJsRequest()
-//            "toggleCancelButton" -> root.handleToggleCancelButtonJsRequest(false) // just a dummy argument
-//            "setText" -> root.handleSetTextJsRequest(args?.getString(0))
-            else -> throw JSApplicationIllegalArgumentException("Unsupported native command received: $commandId")
+            "sendDeeplink" -> sendDeeplink(root, args?.getString(0))
         }
     }
 
-    override fun getCommandsMap(): MutableMap<String, Int>? {
-        return MapBuilder.of("create", 1)
-    }
-
-    override fun create(view: LinearLayout?, viewId: Int) {
-        val parentView = view!!.findViewById<ViewGroup>(viewId)
-        setupLayout(parentView)
-
-        val fragmentManager = (context.currentActivity as FragmentActivity).supportFragmentManager
-        val veraBuilder = VeraConfiguration.Builder(
-            fragmentManager, view!!
-        ).setSiteIDs(listOf("sdk-sample-site"))
-            .setClientAppID("test")
-
-        veraBuilder.startWithoutLogin()
-    }
-
-    fun setupLayout(view: View) {
-        Choreographer.getInstance().postFrameCallback(object: Choreographer.FrameCallback {
-            override fun doFrame(frameTimeNanos: Long) {
-                manuallyLayoutChildren(view)
-                view.viewTreeObserver.dispatchOnGlobalLayout()
-                Choreographer.getInstance().postFrameCallback(this)
-            }
-        })
-    }
-
-    private fun manuallyLayoutChildren(view: View) {
-        // propWidth and propHeight coming from react-native props
-//        val width = requireNotNull(propWidth)
-//        val height = requireNotNull(propHeight)
-
-        view.measure(
-            View.MeasureSpec.makeMeasureSpec(2500, View.MeasureSpec.EXACTLY),
-            View.MeasureSpec.makeMeasureSpec(2500, View.MeasureSpec.EXACTLY))
-
-        view.layout(0, 0, 2500, 2500)
-    }
-
-    override fun pause(view: LinearLayout?) {
+    override fun pause(view: RTNVera?) {
         TODO("Not yet implemented")
     }
 
-    override fun resume(view: LinearLayout?) {
+    override fun resume(view: RTNVera?) {
         TODO("Not yet implemented")
     }
 
-    override fun sendDeeplink(view: LinearLayout?, link: String?) {
-        TODO("Not yet implemented")
+    override fun sendDeeplink(view: RTNVera?, link: String?) {
+        link?.let { vera?.setDeeplinkComponent(it) }
     }
 
-    override fun sendMessage(view: LinearLayout?, receiver: String?, data: String?) {
+    override fun sendMessage(view: RTNVera?, receiver: String?, data: String?) {
         TODO("Not yet implemented")
     }
 }

@@ -70,12 +70,6 @@ export class VeraView extends React.Component<VeraProps> {
         );
       }
 
-      create(viewId: number) {
-        this._callMethodWithRef(ref => 
-          Commands.create(ref, viewId)
-        )
-      }
-
     // MARK: - Callbacks
 
     _onHandleMessage = (event: NativeSyntheticEvent<VeraMessage>) => {

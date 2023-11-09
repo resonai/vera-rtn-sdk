@@ -1,34 +1,30 @@
 package com.rtnvera
 
-import android.graphics.Color
 import android.os.Bundle
-import android.view.Choreographer
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.JSApplicationIllegalArgumentException
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.UIManagerHelper
 import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.ViewManagerDelegate
 import com.facebook.react.uimanager.annotations.ReactProp
-import com.facebook.react.uimanager.annotations.ReactPropGroup
+import com.facebook.react.uimanager.events.EventDispatcher
+import com.facebook.react.uimanager.events.RCTEventEmitter
 import com.facebook.react.viewmanagers.RTNVeraManagerDelegate
 import com.facebook.react.viewmanagers.RTNVeraManagerInterface
+import com.resonai.common.helpers.CallbackRequestToken
 import com.resonai.common.helpers.Languages
-import com.resonai.di.VeraIsolatedKoinContext
 import com.resonai.irocket.VeraConfiguration
-import com.resonai.irocket.VeraFragment
+import com.resonai.irocket.VeraEvents
 
 @ReactModule(name = RTNVeraManager.NAME)
 class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RTNVera>(),
@@ -49,6 +45,23 @@ class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RT
         vera = VeraConfiguration.Builder(
             fragmentManager, view!!, context
         )
+            .onMessageListener(object: VeraEvents.VeraOnMessageListener {
+                override fun onMessage(sender: String?, data: String?) {
+                    val event = Arguments.createMap().apply {
+                        putString("sender", sender)
+                        putString("data", data)
+                    }
+                    val reactContext = context as ReactContext
+                    reactContext
+                        .getJSModule(RCTEventEmitter::class.java)
+                        .receiveEvent(view!!.id, "onHandleMessage", event)
+                }
+            })
+            .onRequestRefreshToken(object: VeraEvents.VeraRequestTokenListener {
+                override fun requestRefreshToken(callbackRequestToken: CallbackRequestToken?) {
+
+                }
+            })
         value?.let {
             vera?.apply {
                 it.getMap("app")?.let { app ->
@@ -74,6 +87,15 @@ class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RT
         }, false)
     }
 
+    override fun getExportedCustomDirectEventTypeConstants(): MutableMap<String, Any>? {
+        return MapBuilder.builder<String, Any>()
+            .put(
+                "onHandleMessage",
+                MapBuilder.of("registrationName", "onHandleMessage")
+            )
+            .build()
+    }
+
     private fun manuallyLayoutChildren(view: View) = view.apply {
         measure(
             View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
@@ -88,11 +110,7 @@ class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RT
     }
 
     override fun receiveCommand(root: RTNVera, commandId: String?, args: ReadableArray?) {
-        super.receiveCommand(root, commandId, args)
-
-        when (commandId) {
-            "sendDeeplink" -> sendDeeplink(root, args?.getString(0))
-        }
+        delegate.receiveCommand(root, commandId, args)
     }
 
     override fun pause(view: RTNVera?) {
@@ -108,6 +126,8 @@ class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RT
     }
 
     override fun sendMessage(view: RTNVera?, receiver: String?, data: String?) {
-        TODO("Not yet implemented")
+        if (!receiver.isNullOrEmpty() && !data.isNullOrEmpty()) {
+            vera?.setMessage(receiver, data)
+        }
     }
 }

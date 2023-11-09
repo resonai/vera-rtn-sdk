@@ -52,10 +52,6 @@ export interface NativeCommands {
         receiver: string,
         data: string
     ) => void;
-    create: (
-        viewRef: React.ElementRef<ComponentType>,
-        viewId: Int32
-    ) => void
 }
 
 export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({
@@ -63,8 +59,7 @@ export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({
     'pause',
     'resume',
     'sendDeeplink',
-    'sendMessage',
-    'create'
+    'sendMessage'
   ]
 });
 

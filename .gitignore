@@ -155,7 +155,3 @@ package-lock.json
 
 # CircleCI
 .circleci/generated_config.yml
-
-
-
-dist

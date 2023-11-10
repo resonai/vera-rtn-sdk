@@ -1,6 +1,6 @@
 import { NativeMethods, NativeSyntheticEvent, ViewProps } from "react-native"
-import { Commands, NativeCommands, VeraCommands, VeraConfiguration, VeraMessage, VeraNativeProps } from "vera-rtn-sdk/js/RTNVeraNativeComponent"
-import RTNVera from "vera-rtn-sdk/js/RTNVeraNativeComponent"
+import { Commands, VeraCommands, VeraConfiguration, VeraMessage, VeraNativeProps } from "."
+import RTNVera from "."
 import React from 'react';
 
 export type VeraComponent = React.Component<VeraNativeProps> & NativeMethods & VeraCommands
@@ -80,7 +80,7 @@ export class VeraView extends React.Component<VeraProps> {
         this.props.onHandleMessage(event.nativeEvent)
     }
 
-    _onLogin = _ => {
+    _onLogin = () => {
         if (!this.props.onLogin) {
             console.log('onLogin is nil')
             return
@@ -88,7 +88,7 @@ export class VeraView extends React.Component<VeraProps> {
         this.props.onLogin()
     }
 
-    _onLogout = _ => {
+    _onLogout = () => {
         if (!this.props.onLogout) {
             console.log('onLogout is nil')
             return
@@ -96,31 +96,11 @@ export class VeraView extends React.Component<VeraProps> {
         this.props.onLogout()
     }
 
-    _onRefreshToken = _ => {
+    _onRefreshToken = () => {
         if (!this.props.onRefreshToken) {
             console.log('onRefreshToken is nil')
             return
         }
         this.props.onRefreshToken()
     }
-
-    // static propTypes = {
-    //     config: PropTypes.shape({
-    //         domain: PropTypes.string,
-    //         username: PropTypes.string,
-    //         language: PropTypes.string,
-    //         app: PropTypes.shape({
-    //             clientId: PropTypes.string.isRequired,
-    //             siteIds: PropTypes.arrayOf(PropTypes.string),
-    //             shouldShowCloseButton: PropTypes.bool,
-    //             hideHeader: PropTypes.bool,
-    //             implementsAuthentication: PropTypes.bool,
-    //             deeplinkPrefix: PropTypes.bool
-    //         })
-    //     }),
-    //     onLogin: PropTypes.func,
-    //     onLogout: PropTypes.func,
-    //     onRefreshToken: PropTypes.func,
-    //     onHandleMessage: PropTypes.func
-    // }
 }

@@ -4,8 +4,6 @@ import codegenNativeComponent from 'react-native/Libraries/Utilities/codegenNati
 import codegenNativeCommands from 'react-native/Libraries/Utilities/codegenNativeCommands';
 import { DirectEventHandler, Int32, WithDefault } from 'react-native/Libraries/Types/CodegenTypes';
 import React, { Component } from 'react';
-import RTNVera from 'vera-rtn-sdk/js';
-import PropTypes from 'prop-types';
 
 export type App = {
     clientId: string,

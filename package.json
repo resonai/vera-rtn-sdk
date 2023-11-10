@@ -1,11 +1,15 @@
 {
   "name": "vera-rtn-sdk",
   "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "src/index.d.ts",
   "description": "Transform commercial buildings into intelligent environments using just your phone.",
-  "react-native": "js/index",
-  "source": "js/index",
+  "scripts": {
+    "build": "tsc",
+    "postinstall": "tsc"
+  },
   "files": [
-    "js",
+    "src",
     "android",
     "ios",
     "vera-rtn-sdk.podspec",
@@ -15,7 +19,11 @@
     "!**/__fixtures__",
     "!**/__mocks__"
   ],
-  "keywords": ["react-native", "ios", "android"],
+  "keywords": [
+    "react-native",
+    "ios",
+    "android"
+  ],
   "repository": "https://github.com/resonai/vera-rtn-sdk",
   "author": "Alex Culeva alexc@resonaixr.com (https://github.com/alexc-resonai)",
   "license": "MIT",
@@ -23,14 +31,18 @@
     "url": "https://github.com/resonai/vera-rtn-sdk/issues"
   },
   "homepage": "https://github.com/resonai/vera-rtn-sdk#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/react-native": "^0.72.6",
+    "typescript": "^4.0.0"
+  },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "@types/react-native": "*"
   },
   "codegenConfig": {
     "name": "RTNVeraSpec",
     "type": "components",
-    "jsSrcsDir": "js"
+    "jsSrcsDir": "src"
   }
 }

@@ -2,6 +2,7 @@ package com.rtnvera
 
 import android.os.Bundle
 import android.view.View
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -27,19 +28,19 @@ import com.resonai.irocket.VeraConfiguration
 import com.resonai.irocket.VeraEvents
 
 @ReactModule(name = RTNVeraManager.NAME)
-class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RTNVera>(),
-    RTNVeraManagerInterface<RTNVera> {
+class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<FrameLayout>(),
+    RTNVeraManagerInterface<FrameLayout> {
     private val delegate = RTNVeraManagerDelegate(this)
     private var vera: VeraConfiguration.Builder? = null
 
-    override fun getDelegate(): ViewManagerDelegate<RTNVera> = delegate
+    override fun getDelegate(): ViewManagerDelegate<FrameLayout> = delegate
 
     override fun getName(): String = NAME
 
-    override fun createViewInstance(context: ThemedReactContext) = RTNVera(context)
+    override fun createViewInstance(context: ThemedReactContext) = FrameLayout(context)
 
     @ReactProp(name = "config")
-    override fun setConfig(view: RTNVera?, value: ReadableMap?) {
+    override fun setConfig(view: FrameLayout?, value: ReadableMap?) {
         val fragmentManager = (context.currentActivity as FragmentActivity).supportFragmentManager
 
         vera = VeraConfiguration.Builder(
@@ -51,15 +52,16 @@ class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RT
                         putString("sender", sender)
                         putString("data", data)
                     }
-                    val reactContext = context as ReactContext
-                    reactContext
+                    (context as ReactContext)
                         .getJSModule(RCTEventEmitter::class.java)
                         .receiveEvent(view!!.id, "onHandleMessage", event)
                 }
             })
             .onRequestRefreshToken(object: VeraEvents.VeraRequestTokenListener {
                 override fun requestRefreshToken(callbackRequestToken: CallbackRequestToken?) {
-
+                    (context as ReactContext)
+                        .getJSModule(RCTEventEmitter::class.java)
+                        .receiveEvent(view!!.id, "onRefreshToken", Arguments.createMap())
                 }
             })
         value?.let {
@@ -93,6 +95,10 @@ class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RT
                 "onHandleMessage",
                 MapBuilder.of("registrationName", "onHandleMessage")
             )
+            .put(
+                "onRefreshToken",
+                MapBuilder.of("registrationName", "onRefreshToken")
+            )
             .build()
     }
 
@@ -109,23 +115,23 @@ class RTNVeraManager(val context: ReactApplicationContext) : ViewGroupManager<RT
         const val NAME = "RTNVera"
     }
 
-    override fun receiveCommand(root: RTNVera, commandId: String?, args: ReadableArray?) {
+    override fun receiveCommand(root: FrameLayout, commandId: String?, args: ReadableArray?) {
         delegate.receiveCommand(root, commandId, args)
     }
 
-    override fun pause(view: RTNVera?) {
+    override fun pause(view: FrameLayout?) {
         TODO("Not yet implemented")
     }
 
-    override fun resume(view: RTNVera?) {
+    override fun resume(view: FrameLayout?) {
         TODO("Not yet implemented")
     }
 
-    override fun sendDeeplink(view: RTNVera?, link: String?) {
+    override fun sendDeeplink(view: FrameLayout?, link: String?) {
         link?.let { vera?.setDeeplinkComponent(it) }
     }
 
-    override fun sendMessage(view: RTNVera?, receiver: String?, data: String?) {
+    override fun sendMessage(view: FrameLayout?, receiver: String?, data: String?) {
         if (!receiver.isNullOrEmpty() && !data.isNullOrEmpty()) {
             vera?.setMessage(receiver, data)
         }

@@ -5,8 +5,7 @@
   "types": "src/index.d.ts",
   "description": "Transform commercial buildings into intelligent environments using just your phone.",
   "scripts": {
-    "build": "tsc",
-    "postinstall": "tsc"
+    "build": "tsc"
   },
   "files": [
     "src",

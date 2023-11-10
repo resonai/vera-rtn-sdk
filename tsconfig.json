@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+      "declaration": true,
+      "target": "es2016",
+      "module": "es6",
+      "lib": ["es6"],
+      "jsx": "react-native",
+      "moduleResolution": "node",
+      "allowSyntheticDefaultImports": true,
+      "strict": true,
+      "noEmit": false,
+      "outDir": "./dist"
+    },
+    "include": ["src/**/*"],
+    "exclude": [
+      "node_modules",
+      "babel.config.js",
+      "metro.config.js",
+      "jest.config.js"
+    ]
+  }

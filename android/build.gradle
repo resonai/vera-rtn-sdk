@@ -21,7 +21,7 @@ android {
   namespace "com.rtnvera"
 
   defaultConfig {
-    minSdkVersion safeExtGet('minSdkVersion', 21)
+    minSdkVersion safeExtGet('minSdkVersion', 28)
     targetSdkVersion safeExtGet('targetSdkVersion', 33)
     buildConfigField("boolean", "IS_NEW_ARCHITECTURE_ENABLED", "true")
   }

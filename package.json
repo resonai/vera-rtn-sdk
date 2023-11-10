@@ -37,8 +37,7 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*",
-    "typescript": "*"
+    "react-native": "*"
   },
   "codegenConfig": {
     "name": "RTNVeraSpec",

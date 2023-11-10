@@ -36,6 +36,5 @@ dependencies {
   implementation 'com.facebook.react:react-native'
   implementation ('com.github.resonai:vera-android-sdk:1.0.6.alpha.1') {
     exclude group:'com.facebook.fbjni', module: 'fbjni-java-only'
-    exclude group:'com.google.firebase', module: 'firebase-crashlytics'
   }
 }

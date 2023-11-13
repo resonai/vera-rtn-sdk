@@ -17,7 +17,7 @@ yarn add https://github.com/resonai/vera-rtn-sdk
 
 ### Android Setup
 
-1. **Gradle Version**: Update the `distrubtionUrl` in `gradle-wrapper.properties` to use Gradle 7.6:
+1. **Gradle Version**: Update the `distributionUrl` in `gradle-wrapper.properties` to use Gradle 7.6:
 ```gradle
 distributionUrl=https\://services.gradle.org/distributions/gradle-7.6-all.zip
 ```

@@ -51,7 +51,15 @@ plugin 'cocoapods-pod-linkage'
 pod 'libwebp', :linkage => :dynamic
 ```
 
-5. (Optional) **Node Binary Export**: Add a `.xcode.env` file with the path to `node` binary if missing:
+5. **Info.plist Keys**
+
+* `NSCameraUsageDescription` - VeraSDK needs access to the camera in order to support AR.
+* `NSLocationWhenInUseUsageDescription` - VeraSDK needs access to location to provide accurate AR experiences.
+
+> [!NOTE]  
+> Vera doesn't need location permission if you configure it with a single site ID.
+
+6. (Optional) **Node Binary Export**: Add a `.xcode.env` file with the path to `node` binary if missing:
 ```bash
 echo export NODE_BINARY=$(command -v node) > .xcode.env
 ```

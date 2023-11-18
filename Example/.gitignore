@@ -159,3 +159,4 @@ vendor/
 
 ios/build
 ios/Pods
+android/app/build

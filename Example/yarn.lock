@@ -6382,7 +6382,7 @@ vary@~1.1.2:
 
 "vera-rtn-sdk@https://github.com/resonai/vera-rtn-sdk":
   version "0.0.1"
-  resolved "https://github.com/resonai/vera-rtn-sdk#62ba3b108ce2a4e1345ff973682c19b6457371fc"
+  resolved "https://github.com/resonai/vera-rtn-sdk#c7880ea282ad5b3cc01c5fe2e07e898c3d2cc153"
 
 vlq@^1.0.0:
   version "1.0.1"

@@ -9,7 +9,8 @@ const App: () => JSX.Element = () => {
       siteIds: ['sdk-sample-site'],
       clientId: 'vera-example-rtn-app'
     },
-    domain: 'https://vera.resonai.com'
+    domain: 'https://vera.resonai.com',
+    language: 'en'
   }
   const deeplink = 'https://vera.resonai.com/#/play/sdk-sample-site/com.resonai.navigation/%7B%22key%22%3A%228207e1fe-3c5a-11ee-9750-12f3c6ba63d8%22%7D'
   const veraRef = useRef<VeraView>(null)
